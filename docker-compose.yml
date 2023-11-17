@@ -1,0 +1,36 @@
+version: '3.8'
+services:
+  master-frontend:
+    build:
+      context: ./frontend
+      args:
+        - MODE=master
+    ports:
+      - '3000:3000'
+    volumes:
+      - './frontend:/app'
+    command: npm run dev
+    depends_on:
+      - backend
+
+  backend:
+    build: ./backend
+    ports:
+      - '5000:5000'
+    volumes:
+      - './backend:/app'
+    command: npm start
+
+  slave-frontend-1:
+    build:
+      context: ./frontend
+      args:
+        - MODE=slave
+        - SLAVE_ID=1
+    ports:
+      - '3100:3000'
+    volumes:
+      - './frontend:/app'
+    command: npm run dev
+    depends_on:
+      - backend
