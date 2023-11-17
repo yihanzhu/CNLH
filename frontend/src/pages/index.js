@@ -2,7 +2,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import AssignmentsContext from "@/pages/context/assignmentsContext"; // Ensure the path is correct
+import AssignmentsContext from "@/pages/context/assignmentsContext";
 import axios from "axios";
 import MasterMailbox from "@/components/MasterMailbox";
 import SlaveMailbox from "@/components/SlaveMailbox";
@@ -14,8 +14,8 @@ const Dashboard = () => {
   const [showTemplateModal, setShowTemplateModal] = useState(false);
   const isMaster = process.env.NEXT_PUBLIC_MODE === "master";
   const [fetchedSlaveIDs, setFetchedSlaveIDs] = useState([]);
-  const [newSlaveID, setNewSlaveID] = useState(""); // State for adding a new slave ID
-  const [slaveId, setSlaveId] = useState(null); // Initialize state for slave ID
+  const [newSlaveID, setNewSlaveID] = useState("");
+  const [slaveId, setSlaveId] = useState(null);
 
   const handleAddSlaveID = async () => {
     if (newSlaveID && !fetchedSlaveIDs.includes(newSlaveID)) {
@@ -103,82 +103,122 @@ const Dashboard = () => {
   }, [isMaster]);
 
   return (
-    <div>
-      {isMaster ? (
-        // Master Dashboard UI
-
-        <div>
-          <div>
-            {/* Existing Slave IDs Display with Remove Button */}
-            <h2>Slave IDs</h2>
-            {fetchedSlaveIDs.map((id, index) => (
-              <div key={index}>
-                {id}{" "}
-                <button onClick={() => handleDirectRemoveSlaveID(id)}>
-                  Remove
+    <div className="main">
+      <h1 className="text-2xl font-bold mb-4">
+        {isMaster ? "Master Dashboard" : "Slave Dashboard"}
+      </h1>
+      <div className="grid grid-cols-4 gap-4">
+        <div className="col-span-2">
+          {/* Slave ID Section */}
+          <div className="border p-4 rounded-md">
+            <h2 className="text-xl mb-4">
+              {isMaster ? "Slave IDs" : `Slave ID: ${slaveId}`}
+            </h2>
+            {isMaster &&
+              fetchedSlaveIDs.map((id, index) => (
+                <div key={index} className="mb-2">
+                  {id}{" "}
+                  <button
+                    onClick={() => handleDirectRemoveSlaveID(id)}
+                    className="text-red-500 ml-2"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+            {isMaster && (
+              <div className="mt-4">
+                <input
+                  type="text"
+                  value={newSlaveID}
+                  onChange={(e) => setNewSlaveID(e.target.value)}
+                  placeholder="Enter Slave ID"
+                  className="w-full p-2 rounded-md border mb-2"
+                />
+                <button
+                  onClick={handleAddSlaveID}
+                  className="p-2 bg-green-500 text-white rounded-md"
+                >
+                  Add Slave ID
                 </button>
               </div>
-            ))}
-
-            {/* Add New Slave ID */}
-            <div>
-              <input
-                type="text"
-                value={newSlaveID}
-                onChange={(e) => setNewSlaveID(e.target.value)}
-                placeholder="Enter Slave ID"
-              />
-              <button onClick={handleAddSlaveID}>Add Slave ID</button>
-            </div>
+            )}
           </div>
 
-          <button onClick={handleCreateAssignment}>
-            Create New Assignment
-          </button>
-          {showTemplateModal && (
-            <div className="modal">
-              <div className="modal-content">
-                <button onClick={() => handleConfirmTemplate("TCP-IP")}>
-                  TCP-IP
-                </button>
-                {/* Additional template buttons */}
-              </div>
-              <button onClick={() => setShowTemplateModal(false)}>Close</button>
-            </div>
-          )}
-          {/* List of assignments with delete and publish options */}
-          {assignments.map((assignment) => (
-            <div key={assignment.id}>
-              {assignment.name}
-              <Link href={`/assignments/${assignment.name}`}>Access</Link>
-              <button onClick={() => deleteAssignment(assignment.id)}>
-                Delete
+          {/* Assignments Section */}
+          <div className="border p-4 rounded-md mt-4">
+            <h2 className="text-xl mb-4">
+              {isMaster ? "Manage Assignments" : "Published Assignments"}
+            </h2>
+            {isMaster && (
+              <button
+                onClick={handleCreateAssignment}
+                className="p-2 bg-green-500 text-white rounded-md"
+              >
+                Create New Assignment
               </button>
-              <button onClick={() => publishAssignment(assignment.id)}>
-                Publish
-              </button>
-            </div>
-          ))}
-          <MasterMailbox />
-        </div>
-      ) : (
-        // Slave Dashboard UI
-        <div>
-          <h2>Slave Dashboard ID: {slaveId}</h2>
-          <h1>Published Assignments</h1>
-          {assignments.length > 0 ? (
-            assignments.map((assignment) => (
-              <div key={assignment.id}>
-                {assignment.name}
-                <Link href={`/assignments/${assignment.name}`}>Access</Link>
+            )}
+            {showTemplateModal && (
+              <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center">
+                <div className="bg-white p-4 rounded-md w-1/3">
+                  <button
+                    onClick={() => handleConfirmTemplate("TCP-IP")}
+                    className="p-2 bg-blue-500 text-white rounded-md mr-2"
+                  >
+                    TCP-IP
+                  </button>
+                  {/* Additional template buttons */}
+                  <button
+                    onClick={() => setShowTemplateModal(false)}
+                    className="p-2 bg-red-500 text-white rounded-md"
+                  >
+                    Close
+                  </button>
+                </div>
               </div>
-            ))
-          ) : (
-            <p>No published assignments available.</p>
-          )}
-          <SlaveMailbox slaveId={slaveId} />
+            )}
+            <div className="mt-4">
+              <ul>
+                {assignments.map((assignment) => (
+                  <li
+                    key={assignment.id}
+                    className="mb-2 flex justify-between items-center"
+                  >
+                    <span className="flex-1 truncate">{assignment.name}</span>
+                    <Link
+                      href={`/assignments/${assignment.name}`}
+                      className="text-blue-500 cursor-pointer ml-2"
+                    >
+                      Access
+                    </Link>
+                    {isMaster && (
+                      <>
+                        <button
+                          onClick={() => deleteAssignment(assignment.id)}
+                          className="text-red-500 cursor-pointer ml-4"
+                        >
+                          Delete
+                        </button>
+                        <button
+                          onClick={() => publishAssignment(assignment.id)}
+                          className="text-green-500 cursor-pointer ml-4"
+                        >
+                          Publish
+                        </button>
+                      </>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
-      )}
+
+        {/* Mailbox Section */}
+        <div className="col-span-2 border p-4 rounded-md">
+          {isMaster ? <MasterMailbox /> : <SlaveMailbox slaveId={slaveId} />}
+        </div>
+      </div>
     </div>
   );
 };

@@ -26,30 +26,54 @@ const SlaveMailbox = ({ slaveId }) => {
       .catch((error) => console.error(error));
   };
 
+  const handleDeleteReply = (replyId) => {
+    axios
+      .delete(`http://localhost:5000/api/replies/${replyId}`)
+      .then(() => {
+        // Update the replies state to remove the deleted reply
+        setReplies(replies.filter((reply) => reply.id !== replyId));
+      })
+      .catch((error) => console.error(error));
+  };
+
   return (
-    <div>
-      <h2>Send Message to Master</h2>
-      <form onSubmit={handleMessageSubmit}>
+    <div className="flex flex-col w-full h-full">
+      <h1 className="text-2xl font-bold mb-4">Send Message to Master</h1>
+      <form onSubmit={handleMessageSubmit} className="mb-4">
         <textarea
+          className="w-full p-2 border rounded-md mb-2"
           value={messageContent}
           onChange={(e) => setMessageContent(e.target.value)}
         />
-        <button type="submit">Send Message</button>
+        <button
+          type="submit"
+          className="p-2 bg-green-500 text-white rounded-md"
+        >
+          Send Message
+        </button>
       </form>
-      <h2>Replies from Master</h2>
-      <table>
+      <h1 className="text-2xl font-bold mb-4">Mailbox</h1>
+      <table className="w-full text-left border-collapse">
         <thead>
-          <tr>
-            <th>Original Message</th>
-            <th>Reply from Master</th>
+          <tr className="border-b">
+            <th className="p-2">Sent Message</th>
+            <th className="p-2">Reply from Master</th>
+            <th className="p-2">Actions</th>
           </tr>
         </thead>
         <tbody>
           {replies.map((reply) => (
-            <tr key={reply.id}>
-              <td>{reply.original_message}</td>{" "}
-              {/* Use the correct property name based on your backend response */}
-              <td>{reply.content || "No reply yet"}</td>
+            <tr key={reply.id} className="border-b">
+              <td className="p-2">{reply.original_message}</td>
+              <td className="p-2">{reply.content || "No reply yet"}</td>
+              <td className="p-2">
+                <button
+                  className="p-2 bg-red-500 text-white rounded-md"
+                  onClick={() => handleDeleteReply(reply.id)}
+                >
+                  Delete
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>

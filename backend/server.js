@@ -206,6 +206,20 @@ app.get('/api/messages', async (req, res) => {
   }
 });
 
+// DELETE endpoint for a specific message
+app.delete('/api/messages/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await db.run("DELETE FROM messages WHERE id = ?", id);
+    if (result.changes > 0) {
+      res.status(200).send({ message: "Message deleted successfully" });
+    } else {
+      res.status(404).send({ message: "Message not found" });
+    }
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+});
 
 
 // POST endpoint for master to reply to a message
