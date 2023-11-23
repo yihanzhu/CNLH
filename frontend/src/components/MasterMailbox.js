@@ -7,7 +7,7 @@ const MasterMailbox = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/messages")
+      .get("http://4.157.105.248:5000/api/messages")
       .then((response) => {
         setMessages(response.data);
         const initialReplies = {};
@@ -25,7 +25,7 @@ const MasterMailbox = () => {
 
   const handleReplySubmit = (messageId) => {
     axios
-      .post("http://localhost:5000/api/replies", {
+      .post("http://4.157.105.248:5000/api/replies", {
         message_id: messageId,
         content: replies[messageId],
       })
@@ -38,7 +38,7 @@ const MasterMailbox = () => {
 
   const handleDeleteMessage = (messageId) => {
     axios
-      .delete(`http://localhost:5000/api/messages/${messageId}`)
+      .delete(`http://4.157.105.248:5000/api/messages/${messageId}`)
       .then(() => {
         // Update the messages state to remove the deleted message
         setMessages(messages.filter((message) => message.id !== messageId));

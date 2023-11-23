@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-master
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend-master
+  template:
+    metadata:
+      labels:
+        app: frontend-master
+    spec:
+      containers:
+      - name: frontend-master
+        image: cnlhapp.azurecr.io/cnlh-master-frontend:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: NEXT_PUBLIC_MODE
+          value: "master"
+        # resources:
+        #   requests:
+        #     memory: "64Mi"
+        #     cpu: "250m"
+        #   limits:
+        #     memory: "128Mi"
+        #     cpu: "500m"

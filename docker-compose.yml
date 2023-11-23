@@ -34,3 +34,31 @@ services:
     command: npm run dev
     depends_on:
       - backend
+
+  slave-frontend-2:
+    build:
+      context: ./frontend
+      args:
+        - MODE=slave
+        - SLAVE_ID=2
+    ports:
+      - '3101:3000'
+    volumes:
+      - './frontend:/app'
+    command: npm run dev
+    depends_on:
+      - backend
+
+  slave-frontend-3:
+    build:
+      context: ./frontend
+      args:
+        - MODE=slave
+        - SLAVE_ID=3
+    ports:
+      - '3102:3000'
+    volumes:
+      - './frontend:/app'
+    command: npm run dev
+    depends_on:
+      - backend

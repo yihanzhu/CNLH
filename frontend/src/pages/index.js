@@ -21,7 +21,7 @@ const Dashboard = () => {
     if (newSlaveID && !fetchedSlaveIDs.includes(newSlaveID)) {
       const updatedSlaveIDs = [...fetchedSlaveIDs, newSlaveID];
       try {
-        await axios.post("http://localhost:5000/api/slave-ids", {
+        await axios.post("http://4.157.105.248:5000/api/slave-ids", {
           slaveIDs: updatedSlaveIDs,
         });
         setFetchedSlaveIDs(updatedSlaveIDs);
@@ -35,7 +35,7 @@ const Dashboard = () => {
   const handleDirectRemoveSlaveID = async (idToRemove) => {
     const updatedSlaveIDs = fetchedSlaveIDs.filter((id) => id !== idToRemove);
     try {
-      await axios.post("http://localhost:5000/api/slave-ids", {
+      await axios.post("http://4.157.105.248:5000/api/slave-ids", {
         slaveIDs: updatedSlaveIDs,
       });
       setFetchedSlaveIDs(updatedSlaveIDs);
@@ -47,10 +47,10 @@ const Dashboard = () => {
   // Function to fetch slave IDs from the backend
   const fetchSlaveIDs = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/slave-ids");
+      const response = await axios.get("http://4.157.105.248:5000/api/slave-ids");
       setFetchedSlaveIDs(response.data);
     } catch (error) {
-      console.error("Error fetching slave IDs", error);
+      console.error("Error fetching slave IDs", error.response || error);
     }
   };
 
@@ -73,7 +73,7 @@ const Dashboard = () => {
   const deleteAssignment = async (id) => {
     try {
       const response = await axios.delete(
-        `http://localhost:5000/api/assignments/${id}`
+        `http://4.157.105.248:5000/api/assignments/${id}`
       );
       if (response.status === 200) {
         // Call fetchAssignments to update the list of assignments
@@ -88,7 +88,7 @@ const Dashboard = () => {
   const publishAssignment = async (id) => {
     try {
       const response = await axios.post(
-        `http://localhost:5000/api/publish/${id}`
+        `http://4.157.105.248:5000/api/publish/${id}`
       );
       console.log(response.data.message);
       fetchAssignments(isMaster);
@@ -100,7 +100,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchAssignments(isMaster); // Pass 'true' for master mode, 'false' for slave mode
-  }, [isMaster]);
+  }, [isMaster, fetchAssignments]);
 
   return (
     <div className="main">

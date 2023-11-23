@@ -14,7 +14,7 @@ export const AssignmentsProvider = ({ children }) => {
 
   const fetchAssignments = async (includeUnpublished = false) => {
     try {
-      let url = 'http://localhost:5000/api/assignments';
+      let url = 'http://4.157.105.248:5000/api/assignments';
       if (!includeUnpublished) {
         url += "?published=true"; // Fetch only published assignments for slave mode
       }
@@ -27,7 +27,7 @@ export const AssignmentsProvider = ({ children }) => {
 
   const addAssignment = async (assignment) => {
     try {
-      const response = await axios.post('http://localhost:5000/api/assignments', assignment);
+      const response = await axios.post('http://4.157.105.248:5000/api/assignments', assignment);
       setAssignments([...assignments, response.data]);
     } catch (error) {
       console.error('Error adding assignment', error);
