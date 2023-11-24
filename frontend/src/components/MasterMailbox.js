@@ -4,10 +4,11 @@ import axios from "axios";
 const MasterMailbox = () => {
   const [messages, setMessages] = useState([]);
   const [replies, setReplies] = useState({}); // Store replies keyed by message ID
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   useEffect(() => {
     axios
-      .get("http://4.157.105.248:5000/api/messages")
+      .get(`http://${backendUrl}:5000/api/messages`)
       .then((response) => {
         setMessages(response.data);
         const initialReplies = {};
@@ -25,7 +26,7 @@ const MasterMailbox = () => {
 
   const handleReplySubmit = (messageId) => {
     axios
-      .post("http://4.157.105.248:5000/api/replies", {
+      .post(`http://${backendUrl}:5000/api/replies`, {
         message_id: messageId,
         content: replies[messageId],
       })
@@ -38,7 +39,7 @@ const MasterMailbox = () => {
 
   const handleDeleteMessage = (messageId) => {
     axios
-      .delete(`http://4.157.105.248:5000/api/messages/${messageId}`)
+      .delete(`http://${backendUrl}:5000/api/messages/${messageId}`)
       .then(() => {
         // Update the messages state to remove the deleted message
         setMessages(messages.filter((message) => message.id !== messageId));

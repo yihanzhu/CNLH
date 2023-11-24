@@ -8,6 +8,7 @@ const getTabName = (tabIndex) => {
 const UserSection = ({ selectedTab, onUpload, side, setMessage }) => {
   const [file, setFile] = useState(null);
   const selectedTabName = getTabName(selectedTab);
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   const handleFileChange = (e) => {
     const chosenFile = e.target.files[0];
@@ -21,7 +22,7 @@ const UserSection = ({ selectedTab, onUpload, side, setMessage }) => {
       data.append("part", selectedTab);
 
       try {
-        const response = await fetch("http://4.157.105.248:5000/api/upload", {
+        const response = await fetch(`http://${backendUrl}:5000/api/upload`, {
           method: "POST",
           body: data,
         });

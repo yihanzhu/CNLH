@@ -4,10 +4,11 @@ import axios from "axios";
 const SlaveMailbox = ({ slaveId }) => {
   const [messageContent, setMessageContent] = useState("");
   const [replies, setReplies] = useState([]);
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   useEffect(() => {
     axios
-      .get(`http://4.157.105.248:5000/api/replies/${slaveId}`)
+      .get(`http://${backendUrl}:5000/api/replies/${slaveId}`)
       .then((response) => setReplies(response.data))
       .catch((error) => console.error(error));
   }, [slaveId]);
@@ -15,7 +16,7 @@ const SlaveMailbox = ({ slaveId }) => {
   const handleMessageSubmit = (e) => {
     e.preventDefault();
     axios
-      .post("http://4.157.105.248:5000/api/messages", {
+      .post(`http://${backendUrl}:5000/api/messages`, {
         slave_id: slaveId,
         content: messageContent,
       })
@@ -28,7 +29,7 @@ const SlaveMailbox = ({ slaveId }) => {
 
   const handleDeleteReply = (replyId) => {
     axios
-      .delete(`http://4.157.105.248:5000/api/replies/${replyId}`)
+      .delete(`http://${backendUrl}:5000/api/replies/${replyId}`)
       .then(() => {
         // Update the replies state to remove the deleted reply
         setReplies(replies.filter((reply) => reply.id !== replyId));

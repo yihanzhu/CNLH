@@ -5,6 +5,7 @@ services:
       context: ./frontend
       args:
         - MODE=master
+        - BACKEND_URL=localhost
     ports:
       - '3000:3000'
     volumes:
@@ -27,36 +28,9 @@ services:
       args:
         - MODE=slave
         - SLAVE_ID=1
+        - BACKEND_URL=localhost
     ports:
       - '3100:3000'
-    volumes:
-      - './frontend:/app'
-    command: npm run dev
-    depends_on:
-      - backend
-
-  slave-frontend-2:
-    build:
-      context: ./frontend
-      args:
-        - MODE=slave
-        - SLAVE_ID=2
-    ports:
-      - '3101:3000'
-    volumes:
-      - './frontend:/app'
-    command: npm run dev
-    depends_on:
-      - backend
-
-  slave-frontend-3:
-    build:
-      context: ./frontend
-      args:
-        - MODE=slave
-        - SLAVE_ID=3
-    ports:
-      - '3102:3000'
     volumes:
       - './frontend:/app'
     command: npm run dev

@@ -94,13 +94,13 @@ const Assignment = () => {
     <div className="p-8">
       <div className="grid grid-cols-2 sm:grid-cols-1 gap-4">
         <Window
-          name="Sender"
+          name="Sender's TCP/IP Model"
           isAdmin={false}
           tabColors={tabColors}
           uploadedTabs={senderFileUploads}
         />
         <Window
-          name="Receiver"
+          name="Receiver's TCP/IP Model"
           isAdmin={false}
           tabColors={tabColors}
           uploadedTabs={receiverFileUploads}

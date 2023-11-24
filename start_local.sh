@@ -15,6 +15,7 @@ services:
       context: ./frontend
       args:
         - MODE=master
+        - BACKEND_URL=localhost
     ports:
       - '3000:3000'
     volumes:
@@ -45,6 +46,7 @@ add_slave_service() {
       args:
         - MODE=slave
         - SLAVE_ID=$slave_id
+        - BACKEND_URL=localhost
     ports:
       - '$port_mapping'
     volumes:
