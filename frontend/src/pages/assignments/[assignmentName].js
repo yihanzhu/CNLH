@@ -1,7 +1,7 @@
 // [assignmentName].js
 import React, { useState, useContext, useEffect } from "react";
 import { useRouter } from "next/router";
-import AssignmentsContext from "../context/assignmentsContext"; // Ensure the path is correct
+import AssignmentsContext from "@/pages/context/assignmentsContext"; // Ensure the path is correct
 
 import Window from "@/components/project/Window";
 import UserSection from "@/components/project/UserSection";
@@ -58,23 +58,26 @@ const Assignment = () => {
   };
 
   useEffect(() => {
-    const assignment = assignments.find(a => a.name === assignmentName);
+    const assignment = assignments.find((a) => a.name === assignmentName);
     setCurrentAssignment(assignment);
-  
+
     if (assignment && assignment.data) {
       try {
         // Attempt to parse the JSON data
         const assignmentData = JSON.parse(assignment.data);
         const initialTabColors = Array(6).fill("green");
-  
+
         // Ensure that selectedTab exists in the parsed data
-        if (typeof assignmentData.selectedTab === 'number') {
+        if (typeof assignmentData.selectedTab === "number") {
           setConfirmedTabIndex(assignmentData.selectedTab);
-          if (assignmentData.selectedTab >= 0 && assignmentData.selectedTab < 6) {
+          if (
+            assignmentData.selectedTab >= 0 &&
+            assignmentData.selectedTab < 6
+          ) {
             initialTabColors[assignmentData.selectedTab] = "red"; // Set confirmed tab to red
           }
         }
-  
+
         setTabColors(initialTabColors);
       } catch (error) {
         // Handle JSON parsing errors
@@ -92,6 +95,14 @@ const Assignment = () => {
 
   return (
     <div className="p-8">
+      <button
+        onClick={() => {
+          router.back()
+        }}
+        className="p-2 bg-gray-300 text-black rounded-md"
+      >
+        Return to Dashboard
+      </button>
       <div className="grid grid-cols-2 sm:grid-cols-1 gap-4">
         <Window
           name="Sender's TCP/IP Model"

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useContext } from "react";
 import { useRouter } from "next/router";
-import AssignmentsContext from "../context/assignmentsContext";
+import AssignmentsContext from "@/pages/context/assignmentsContext";
 
 import Window from "@/components/project/Window";
 import AdminSection from "@/components/project/AdminSection";
@@ -28,7 +28,7 @@ const TCP_IP = () => {
       .toLowerCase();
     addAssignment({ name: sanitizedName, data: { selectedTab } });
     setShowSaveModal(false);
-    router.push("/");
+    router.back();
   };
 
   return (
@@ -51,8 +51,6 @@ const TCP_IP = () => {
               <button
                 onClick={() => {
                   saveAssignment();
-                  setShowSaveModal(false);
-                  router.push("/"); // Redirects to the Instructor Dashboard after saving
                 }}
                 className="p-2 bg-blue-500 text-white rounded-md mr-2"
               >
