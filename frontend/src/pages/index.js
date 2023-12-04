@@ -6,15 +6,42 @@ const Home = () => {
   const [role, setRole] = useState("");
   const [id, setId] = useState("");
   const [showIdInput, setShowIdInput] = useState(false);
+  const [error, setError] = useState("");
   const router = useRouter();
 
   const handleRoleSelection = (selectedRole) => {
     setRole(selectedRole);
     setShowIdInput(true);
+    setError("");
+  };
+
+  const verifyRoleAndId = async () => {
+    try {
+      const response = await fetch("/api/verify-role", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ role, id: id.toString() }),
+      });
+      const data = await response.json();
+
+      if (response.ok) {
+        router.push(`/dashboard/${role}/${id}`);
+      } else {
+        setError(data.message); // Set error in state
+        setId("");
+      }
+    } catch (error) {
+      console.error("Error during role verification:", error);
+      setError("Error verifying role and ID"); // Set error in state
+    }
   };
 
   const handleSubmit = () => {
     if (role && id) {
+      // TODO: Uncomment this line when you're ready to verify the role and ID
+      // verifyRoleAndId();
       router.push(`/dashboard/${role}/${id}`);
     }
   };
@@ -66,6 +93,8 @@ const Home = () => {
             </div>
           </div>
         )}
+
+        {error && <div className="text-red-500">{error}</div>}
       </div>
     </div>
   );

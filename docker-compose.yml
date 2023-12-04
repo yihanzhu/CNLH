@@ -1,11 +1,11 @@
 version: '3.8'
 services:
-  master-frontend:
+  frontend:
     build:
       context: ./frontend
       args:
-        - MODE=master
-        - BACKEND_URL=localhost
+        - BACKEND_URL=${BACKEND_URL}
+        # - BACKEND_URL=localhost
     ports:
       - '3000:3000'
     volumes:
@@ -22,17 +22,3 @@ services:
       - './backend:/app'
     command: npm start
 
-  slave-frontend-1:
-    build:
-      context: ./frontend
-      args:
-        - MODE=slave
-        - SLAVE_ID=1
-        - BACKEND_URL=localhost
-    ports:
-      - '3100:3000'
-    volumes:
-      - './frontend:/app'
-    command: npm run dev
-    depends_on:
-      - backend

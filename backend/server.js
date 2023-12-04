@@ -29,6 +29,13 @@ async function setupDatabase() {
   `);
 
   await db.exec(`
+    CREATE TABLE IF NOT EXISTS master_ids (
+      id INTEGER PRIMARY KEY,
+      master_id INTEGER UNIQUE
+    )
+  `);
+
+  await db.exec(`
     CREATE TABLE IF NOT EXISTS messages (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       slave_id INTEGER,
@@ -46,6 +53,13 @@ async function setupDatabase() {
       FOREIGN KEY (message_id) REFERENCES messages (id)
     )
   `);
+
+  // Insert default master ID
+  const defaultMasterId = 1;
+  await db.run(
+    "INSERT OR IGNORE INTO master_ids (master_id) VALUES (?)",
+    defaultMasterId
+  );
 
   return db;
 }
@@ -78,6 +92,28 @@ setupDatabase().then((database) => {
   app.listen(port, () => {
     console.log(`Server running on port ${port}`);
   });
+});
+
+app.post("/api/verify-role", async (req, res) => {
+  const { role, id } = req.body;
+  const numericId = parseInt(id, 10);
+
+  try {
+    let table = role === "master" ? "master_ids" : "slave_ids";
+    const row = await db.get(
+      `SELECT * FROM ${table} WHERE ${role}_id = ?`,
+      numericId
+    );
+
+    if (row) {
+      res.status(200).send({ message: "Authentication successful", role, id });
+    } else {
+      res.status(404).send({ message: "Wrong authentication" });
+    }
+  } catch (error) {
+    console.error("Error in /api/verify-role:", error.stack);
+    res.status(500).send({ error: error.message });
+  }
 });
 
 app.post("/api/assignments", async (req, res) => {
@@ -146,11 +182,9 @@ app.post("/api/publish/:id", async (req, res) => {
 app.post("/api/upload", upload.single("file"), (req, res) => {
   if (req.file) {
     console.log(`Received file: ${req.file.originalname}`);
-    res
-      .status(200)
-      .send({
-        message: `File ${req.file.originalname} uploaded successfully.`,
-      });
+    res.status(200).send({
+      message: `File ${req.file.originalname} uploaded successfully.`,
+    });
   } else {
     console.error("File upload failed.");
     res.status(400).send({ message: "No file uploaded." });
@@ -185,23 +219,31 @@ app.get("/api/slave-ids", async (req, res) => {
 });
 
 // POST endpoint to send a message from slave to master
-app.post('/api/messages', async (req, res) => {
+app.post("/api/messages", async (req, res) => {
   const { slave_id, content } = req.body;
   try {
-    const result = await db.run('INSERT INTO messages (slave_id, content) VALUES (?, ?)', [slave_id, content]);
-    res.status(201).send({ message: 'Message sent successfully', id: result.lastID });
+    const result = await db.run(
+      "INSERT INTO messages (slave_id, content) VALUES (?, ?)",
+      [slave_id, content]
+    );
+    res
+      .status(201)
+      .send({ message: "Message sent successfully", id: result.lastID });
   } catch (error) {
     res.status(500).send({ error: error.message });
   }
 });
 
 // GET endpoint for master to fetch all messages with their replies
-app.get('/api/messages', async (req, res) => {
+app.get("/api/messages", async (req, res) => {
   try {
-    const messages = await db.all('SELECT * FROM messages');
+    const messages = await db.all("SELECT * FROM messages");
     for (const message of messages) {
-      const replies = await db.all('SELECT content FROM replies WHERE message_id = ?', [message.id]);
-      message.replies = replies.map(reply => reply.content);
+      const replies = await db.all(
+        "SELECT content FROM replies WHERE message_id = ?",
+        [message.id]
+      );
+      message.replies = replies.map((reply) => reply.content);
     }
     res.status(200).send(messages);
   } catch (error) {
@@ -210,7 +252,7 @@ app.get('/api/messages', async (req, res) => {
 });
 
 // DELETE endpoint for a specific message
-app.delete('/api/messages/:id', async (req, res) => {
+app.delete("/api/messages/:id", async (req, res) => {
   const { id } = req.params;
   try {
     const result = await db.run("DELETE FROM messages WHERE id = ?", id);
@@ -224,32 +266,37 @@ app.delete('/api/messages/:id', async (req, res) => {
   }
 });
 
-
 // POST endpoint for master to reply to a message
-app.post('/api/replies', async (req, res) => {
+app.post("/api/replies", async (req, res) => {
   const { message_id, content } = req.body;
   try {
-    const result = await db.run('INSERT INTO replies (message_id, content) VALUES (?, ?)', [message_id, content]);
-    res.status(201).send({ message: 'Reply sent successfully', id: result.lastID });
+    const result = await db.run(
+      "INSERT INTO replies (message_id, content) VALUES (?, ?)",
+      [message_id, content]
+    );
+    res
+      .status(201)
+      .send({ message: "Reply sent successfully", id: result.lastID });
   } catch (error) {
     res.status(500).send({ error: error.message });
   }
 });
 
 // GET endpoint for slave to fetch replies with original message content
-app.get('/api/replies/:slaveId', async (req, res) => {
+app.get("/api/replies/:slaveId", async (req, res) => {
   const { slaveId } = req.params;
   try {
-    const replies = await db.all(`
+    const replies = await db.all(
+      `
       SELECT replies.id, messages.content AS original_message, replies.content
       FROM replies
       JOIN messages ON replies.message_id = messages.id
       WHERE messages.slave_id = ?
-    `, [slaveId]);
+    `,
+      [slaveId]
+    );
     res.status(200).send(replies);
   } catch (error) {
     res.status(500).send({ error: error.message });
   }
 });
-
-

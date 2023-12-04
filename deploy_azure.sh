@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Set the BACKEND_URL environment variable
+export BACKEND_URL="20.246.178.64" # Replace with your backend URL
 # Azure details
 LOCATION="eastus" # Replace with your location
 RESOURCE_GROUP="cnlh_group" # Replace with your resource group name
@@ -11,9 +13,7 @@ ACR_NAME="cnlhapp"
 CLUSTER_NAME="cnlhAKSCluster"
 
 # List of your Docker images
-IMAGES=("cnlh-backend:latest" "cnlh-master-frontend:latest" "cnlh-slave-frontend-1:latest") # Replace with your image names and tags
-
-
+IMAGES=("cnlh-backend:latest" "cnlh-frontend:latest") # Replace with your image names and tags
 
 # Create Azure Container Registry
 az group create --name $RESOURCE_GROUP --location $LOCATION
@@ -30,7 +30,7 @@ for IMAGE in "${IMAGES[@]}"
 do
   # Tag the image
   docker tag $IMAGE $ACR_NAME.azurecr.io/$IMAGE
-  
+
   # Push the image to ACR
   docker push $ACR_NAME.azurecr.io/$IMAGE
 done

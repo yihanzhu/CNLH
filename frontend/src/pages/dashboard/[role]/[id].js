@@ -59,10 +59,12 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    // Set the slave ID from the environment variable on the client side
-    setSlaveId(process.env.NEXT_PUBLIC_REACT_APP_SLAVE_ID);
+    if (!isMaster) {
+      // Set the slave ID from the URL query parameter when the role is 'slave'
+      setSlaveId(id);
+    }
     fetchSlaveIDs();
-  }, []);
+  }, [isMaster, id, fetchSlaveIDs]);
 
   // Master mode functionalities
   const handleCreateAssignment = () => {
